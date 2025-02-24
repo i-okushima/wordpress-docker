@@ -3,29 +3,32 @@ version: "3.8"
 services:
   wordpress:
     build: .
-    image: wordpress-docker
-    container_name: wordpress-container
+    container_name: wordpress_app
+    restart: always
     ports:
-      - "8002:80" # ホストのポート8002をコンテナのポート80にマッピング
+      - "8002:80"
     environment:
-      WORDPRESS_DB_HOST: mysql:3306
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: root
-      WORDPRESS_DB_PASSWORD: example
+      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
+      - WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}
+      - WORDPRESS_DB_USER=${WORDPRESS_DB_USER}
+      - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
+    depends_on:
+      - db
     volumes:
       - wordpress_data:/var/www/html
-    depends_on:
-      - mysql
 
-  mysql:
+  db:
     image: mysql:5.7
-    container_name: mysql-container
+    container_name: wordpress_db
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: wordpress
+      - MYSQL_DATABASE=${WORDPRESS_DB_NAME}
+      - MYSQL_USER=${WORDPRESS_DB_USER}
+      - MYSQL_PASSWORD=${WORDPRESS_DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=root_password
     volumes:
-      - mysql_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
 
 volumes:
   wordpress_data:
-  mysql_data:
+  db_data:
